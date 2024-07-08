@@ -4,8 +4,10 @@ pragma solidity 0.8.23;
 import {Test} from "forge-std/Test.sol";
 import {MerkleAirdrop} from "../src/MerkleAirdrop.sol";
 import {CoffeeToken} from "../src/CoffeeToken.sol";
+import {ZkSyncChainChecker} from "foundry-devops/src/ZkSyncChainChecker.sol";
+import {DeployMerkleAirdrop} from "../script/DeployMerkleAirdrop.s.sol";
 
-contract MerkleAirdropTest is Test {
+contract MerkleAirdropTest is ZkSyncChainChecker, Test {
 
     MerkleAirdrop private merkleAirdrop;
     CoffeeToken private coffeeToken;
@@ -19,9 +21,16 @@ contract MerkleAirdropTest is Test {
     bytes32[] public MERKLE_PROOF = [proofOne, proofTwo];
 
     function setUp() public {
-        coffeeToken = new CoffeeToken();
-        merkleAirdrop = new MerkleAirdrop(MERKLE_ROOT, coffeeToken);
-        coffeeToken.mint(address(merkleAirdrop), AMOUNT);
+        if (!isZkSyncChain()) {
+            // deploy with the script
+            DeployMerkleAirdrop deployer = new DeployMerkleAirdrop();
+            (merkleAirdrop, coffeeToken) = deployer.deployMerkleAirdropAndCoffeeToken();
+        } else {
+            // deploy with the contract
+            coffeeToken = new CoffeeToken();
+            merkleAirdrop = new MerkleAirdrop(MERKLE_ROOT, coffeeToken);
+            coffeeToken.mint(address(merkleAirdrop), AMOUNT);
+        }
         (user, userKey) = makeAddrAndKey("user");
     }
 
