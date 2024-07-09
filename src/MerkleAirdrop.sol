@@ -3,13 +3,31 @@ pragma solidity 0.8.23;
 
 import {IERC20, SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
-contract MerkleAirdrop {
+contract MerkleAirdrop is EIP712 {
 
     using SafeERC20 for IERC20;
 
     error MerkleAirdrop__InvalidProof();
     error MerkleAirdrop__AlreadyClaimed();
+    error MerkleAirdrop__InvalidSignature();
+
+    struct EIP712Domain {
+        string name;
+        string version;
+        uint256 chainId;
+        address verifyingContract;
+        bytes32 salt;
+    }
+
+    struct ClaimAirdrop {
+        address account;
+        uint256 amount;
+    }
+
+    bytes32 public constant TYPED_HASH = keccak256("MerkleAirdrop(address account,uint256 amount)");
 
     address[] private claimers;
     bytes32 private immutable i_merkleRoot;
@@ -18,15 +36,18 @@ contract MerkleAirdrop {
 
     event Claim(address account, uint256 amount);
 
-    constructor(bytes32 merkleRoot, IERC20 airdropToken) {
+    constructor(bytes32 merkleRoot, IERC20 airdropToken) EIP712("MerkleAirdrop", "1") {
         i_merkleRoot = merkleRoot;
         i_airdropToken = airdropToken;
     }
 
-    function claim(address account, uint256 amount, bytes32[] calldata merkleProof) external {
+    function claim(address account, uint256 amount, bytes32[] calldata merkleProof, uint8 v, bytes32 r, bytes32 s) external {
         // Check if the account has already claimed
         if (hasClaimed[account]) {
             revert MerkleAirdrop__AlreadyClaimed();
+        }
+        if (!_isValidSignature(account, getMessageHash(account, amount), v, r, s)) {
+            revert MerkleAirdrop__InvalidSignature();
         }
         // Calculate using the account and the amount, the hash -> leaf node
         bytes32 leaf = keccak256(bytes.concat(keccak256(abi.encode(account, amount))));
@@ -48,4 +69,34 @@ contract MerkleAirdrop {
         return address(i_airdropToken);
     }
 
+    function getMessageHash(address account, uint256 amount) public view returns (bytes32) {
+        return _hashTypedDataV4(keccak256(abi.encode(
+            TYPED_HASH,
+            ClaimAirdrop(account, amount)
+        )));
+    }
+
+    // function hashDomain(EIP712Domain memory domain) private pure returns (bytes32) {
+    //     return keccak256(abi.encode(
+    //         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract,bytes32 salt)"),
+    //         keccak256(bytes(domain.name)),
+    //         keccak256(bytes(domain.version)),
+    //         domain.chainId,
+    //         domain.verifyingContract,
+    //         domain.salt
+    //     ));
+    // }
+
+    // function hashMessage(address account, uint256 amount) private pure returns (bytes32) {
+    //     return keccak256(abi.encode(
+    //         keccak256(bytes("MerkleAirdrop(address account,uint256 amount)")),
+    //         account,
+    //         amount
+    //     ));
+    // }
+
+    function _isValidSignature(address account, bytes32 digest, uint8 v, bytes32 r, bytes32 s) internal pure returns (bool) {
+        (address actualSigner, , ) = ECDSA.tryRecover(digest, v, r, s);
+        return actualSigner == account;
+    }
 }
