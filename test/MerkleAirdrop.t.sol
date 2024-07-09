@@ -15,10 +15,10 @@ contract MerkleAirdropTest is ZkSyncChainChecker, Test {
     address private user;
     uint256 private userKey;
 
-    uint256 public constant AMOUNT = 10 ether;
-    bytes32 public constant MERKLE_ROOT = 0xccb309293eed85a238c26406b58308e2846931836195702f5feb87a0000c0419;
-    bytes32 proofOne = 0x50307774e64ddd9e65a8ffe90976869c1f52c4a27bad56f4e383c530d6b75217;
-    bytes32 proofTwo = 0x8aceb2bc486afcff8c556bdc8e44f21f32686822d57f25a4b33ca358a4a5dc45;
+    uint256 public constant AMOUNT = 25 ether;
+    bytes32 public constant MERKLE_ROOT = 0xaa5d581231e596618465a56aa0f5870ba6e20785fe436d5bfb82b08662ccc7c4;
+    bytes32 proofOne = 0x0fd7c981d39bece61f7499702bf59b3114a90e66b51ba2c53abdf7b62986c00a;
+    bytes32 proofTwo = 0xe5ebd1e1b5a5478a944ecab36a9a954ac3b6b8216875f6524caa7a1d87096576;
     bytes32[] public MERKLE_PROOF = [proofOne, proofTwo];
 
     function setUp() public {

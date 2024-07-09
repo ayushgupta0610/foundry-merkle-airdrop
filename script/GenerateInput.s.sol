@@ -21,10 +21,10 @@ contract GenerateInput is Script {
         whitelist[2] = "0x2ea3970Ed82D5b30be821FAAD4a731D35964F7dd";
         whitelist[3] = "0xf6dBa02C01AF48Cf926579F77C9f874Ca640D91D";
 
-        amounts[0] = 10 * 1e18;
-        amounts[1] = 12 * 1e18;
+        amounts[0] = 25 * 1e18;
+        amounts[1] = 25 * 1e18;
         amounts[2] = 25 * 1e18;
-        amounts[3] = 43 * 1e18;
+        amounts[3] = 25 * 1e18;
         count = whitelist.length;
         string memory input = _createJSON();
         // write to the output file the stringified output json tree dumpus 

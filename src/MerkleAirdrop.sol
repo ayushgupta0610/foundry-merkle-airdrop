@@ -14,20 +14,12 @@ contract MerkleAirdrop is EIP712 {
     error MerkleAirdrop__AlreadyClaimed();
     error MerkleAirdrop__InvalidSignature();
 
-    struct EIP712Domain {
-        string name;
-        string version;
-        uint256 chainId;
-        address verifyingContract;
-        bytes32 salt;
-    }
-
-    struct ClaimAirdrop {
+    struct AirdropClaim {
         address account;
         uint256 amount;
     }
 
-    bytes32 public constant TYPED_HASH = keccak256("MerkleAirdrop(address account,uint256 amount)");
+    bytes32 public constant TYPED_HASH = keccak256("AirdropClaim(address account,uint256 amount)");
 
     address[] private claimers;
     bytes32 private immutable i_merkleRoot;
@@ -36,7 +28,7 @@ contract MerkleAirdrop is EIP712 {
 
     event Claim(address account, uint256 amount);
 
-    constructor(bytes32 merkleRoot, IERC20 airdropToken) EIP712("MerkleAirdrop", "1") {
+    constructor(bytes32 merkleRoot, IERC20 airdropToken) EIP712("MerkleAirdrop", "1.0.0") {
         i_merkleRoot = merkleRoot;
         i_airdropToken = airdropToken;
     }
@@ -70,30 +62,13 @@ contract MerkleAirdrop is EIP712 {
     }
 
     function getMessageHash(address account, uint256 amount) public view returns (bytes32) {
-        return _hashTypedDataV4(keccak256(abi.encode(
-            TYPED_HASH,
-            ClaimAirdrop(account, amount)
-        )));
+        return _hashTypedDataV4(keccak256(
+            abi.encode(
+                TYPED_HASH,
+                AirdropClaim(account, amount)
+            )
+        ));
     }
-
-    // function hashDomain(EIP712Domain memory domain) private pure returns (bytes32) {
-    //     return keccak256(abi.encode(
-    //         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract,bytes32 salt)"),
-    //         keccak256(bytes(domain.name)),
-    //         keccak256(bytes(domain.version)),
-    //         domain.chainId,
-    //         domain.verifyingContract,
-    //         domain.salt
-    //     ));
-    // }
-
-    // function hashMessage(address account, uint256 amount) private pure returns (bytes32) {
-    //     return keccak256(abi.encode(
-    //         keccak256(bytes("MerkleAirdrop(address account,uint256 amount)")),
-    //         account,
-    //         amount
-    //     ));
-    // }
 
     function _isValidSignature(address account, bytes32 digest, uint8 v, bytes32 r, bytes32 s) internal pure returns (bool) {
         (address actualSigner, , ) = ECDSA.tryRecover(digest, v, r, s);

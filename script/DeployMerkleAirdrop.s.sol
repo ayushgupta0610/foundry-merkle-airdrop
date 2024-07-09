@@ -9,7 +9,7 @@ import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProo
 
 contract DeployMerkleAirdrop is Script {
 
-    bytes32 public constant MERKLE_ROOT = 0xccb309293eed85a238c26406b58308e2846931836195702f5feb87a0000c0419;
+    bytes32 public constant MERKLE_ROOT = 0xaa5d581231e596618465a56aa0f5870ba6e20785fe436d5bfb82b08662ccc7c4;
     uint256 public constant AIRDROP_AMOUNT = 90 * 1e18;
 
     function run() public returns (MerkleAirdrop, CoffeeToken) {

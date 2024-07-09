@@ -8,11 +8,11 @@ import {DevOpsTools} from "foundry-devops/src/DevOpsTools.sol";
 contract Interact is Script {
 
     address private constant ACCOUNT = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
-    uint256 private constant AMOUNT = 12 ether;
-    bytes32 private constant MERKLE_ROOT = 0xccb309293eed85a238c26406b58308e2846931836195702f5feb87a0000c0419;
-    bytes32 private constant proofOne = 0x61798996101a3d9485268bfee4341d8e2ec44d9baa50cef242569f5a628519b9;
-    bytes32 private constant proofTwo = 0x8aceb2bc486afcff8c556bdc8e44f21f32686822d57f25a4b33ca358a4a5dc45;
-    bytes private SIGNATURE = hex"fa19c32433ff40d777ac2b9b340dc3aa736f1f905bde4dc824f9985319c1e1841b1e50e7555cafd2eb9bf37852364c2048080c918f484d2b27bef45af194c1e91c";
+    uint256 private constant AMOUNT = 25 ether;
+    bytes32 private constant MERKLE_ROOT = 0xaa5d581231e596618465a56aa0f5870ba6e20785fe436d5bfb82b08662ccc7c4;
+    bytes32 private constant proofOne = 0xd1445c931158119b00449ffcac3c947d028c0c359c34a6646d95962b3b55c6ad;
+    bytes32 private constant proofTwo = 0xe5ebd1e1b5a5478a944ecab36a9a954ac3b6b8216875f6524caa7a1d87096576;
+    bytes private SIGNATURE = hex"46302dfca08ea2b4fc861b8592e54b687c4c1f06a4dd2f10e59167502f18d14e79c7ca0f6c5cdd01b6c471ac8d18d63ff4924a14ad770f21c6574634552b8fbe1b";
 
     bytes32[] private merkleProof = [proofOne, proofTwo];
 
