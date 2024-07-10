@@ -8,6 +8,7 @@ import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
 contract MerkleAirdrop is EIP712 {
 
+    using ECDSA for bytes32;
     using SafeERC20 for IERC20;
 
     error MerkleAirdrop__InvalidProof();
@@ -61,13 +62,11 @@ contract MerkleAirdrop is EIP712 {
         return address(i_airdropToken);
     }
 
+    // message we expect to have been signed
     function getMessageHash(address account, uint256 amount) public view returns (bytes32) {
-        return _hashTypedDataV4(keccak256(
-            abi.encode(
-                TYPED_HASH,
-                AirdropClaim(account, amount)
-            )
-        ));
+        return _hashTypedDataV4(
+            keccak256(abi.encode(TYPED_HASH, AirdropClaim({ account: account, amount: amount })))
+        );
     }
 
     function _isValidSignature(address account, bytes32 digest, uint8 v, bytes32 r, bytes32 s) internal pure returns (bool) {
